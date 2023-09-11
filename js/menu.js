@@ -10,12 +10,13 @@ document.querySelector('#close-nav-menu').addEventListener('click', function () 
 
 
 //Greeting section
-const greet = 'Good Afternoon';
 const condition = 'Sunny';
 const userLocation = 'New Zw';
 let temperature = 98.80000996;
 
-document.querySelector('.weather-group').addEventListener('click', function(e) {
+
+//switch temperature value form fahrenheit to celcius and vise versa depending on selected 
+document.querySelector('.weather-group').addEventListener('click', function (e) {
     let temp = e.target.id;
     let weatherText = '';
     if (temp == 'fahr') {
@@ -27,16 +28,60 @@ document.querySelector('.weather-group').addEventListener('click', function(e) {
 });
 
 
+//updates clock every second
+setInterval(function () {
+    let date = new Date();
+
+    hour = date.getHours();
+    minute = date.getMinutes();
+    seconds = date.getSeconds();
+
+    document.querySelector('span[data-time=hours]').textContent = hour.toString().padStart(2, "0");
+    document.querySelector('span[data-time=minutes]').textContent = minute.toString().padStart(2, "0");
+    document.querySelector('span[data-time=seconds]').textContent = seconds.toString().padStart(2, "0");
+
+    console.log(hour)
+    if (hour > 6 && hour < 12) {
+        updateElement('#greeting', 'Good Morning');
+    } else if (hour >= 12 && hour < 18) {
+        updateElement('#greeting', 'Good Afternoon');
+    } else if (hour >= 18 && hour < 24) {
+        updateElement('#greeting', 'Good Evening');
+    } else {
+        updateElement('#greeting', 'Good Night');
+    }
+
+}, 1000);
+
+//src="./assets/gallery/image1.jpg" alt="Thumbnail Image 1"
+const images = [
+    {
+        src: "./assets/gallery/image1.jpg",
+        alt: "Thumbnail Image 1"
+    },
+    {
+        src: "./assets/gallery/image2.jpg",
+        alt: "Thumbnail Image 2"
+    },
+    {
+        src: "./assets/gallery/image3.jpg",
+        alt: "Thumbnail Image 3"
+    }
+];
+
+images.forEach(function (img) {
+    console.log(img);
+});
 
 function updateElement(id, text) {
     document.querySelector(id).innerHTML = text
 }
 
-function celToFar (cel) {
-    return ((cel * 9/5) + 32); 
+function celToFar(cel) {
+    return ((cel * 9 / 5) + 32);
 }
 
-updateElement('#greeting', greet)
+
 
 
 // function maxInArr (arr) {
