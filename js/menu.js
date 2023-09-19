@@ -49,6 +49,9 @@ const products = [
     }
 ];
 
+const weatherAPIKEY = `d25ca801f64b6817457b076723ed2fc3`;
+const weatherAPIURL = `https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={API key}&units=metric`;
+
 function menuHandler() {
     document.querySelector("#open-nav-menu").addEventListener("click", function () {
         document.querySelector("header nav .wrapper").classList.add("nav-open");
@@ -59,8 +62,6 @@ function menuHandler() {
     });
 
 }
-
-
 
 function clockHandler() {
     //updates clock every second
@@ -124,18 +125,6 @@ function celToFar(cel) {
     return (cel * 9) / 5 + 32;
 }
 
-//Products section
-/* <div class="product-item">
-          <img src="./assets/products/img6.png" alt="AstroFiction">
-          <div class="product-details">
-            <h3 class="product-title">AstroFiction</h3>
-            <p class="product-author">John Doe</p>
-            <p class="price-title">Price</p>
-            <p class="product-price">$ 49.90</p>
-          </div>
-        </div> */
-//Page load
-
 function populateProducts(prods) {
     let prodSection = document.querySelector('.products-area');
     prodSection.textContent = "";
@@ -182,6 +171,7 @@ function populateProducts(prods) {
     });
 
 }
+
 function productHandler() {
 
     document.querySelector('.products-filter label[for=all] span.product-amount').textContent = products.length;
@@ -213,16 +203,6 @@ function populateFooter() {
     year = new Date().getFullYear();
     document.querySelector('footer').textContent = `© Copyright ${year}`;
 }
-// function processData(data) {
-
-//     location = ${ data.location.name };
-//     console.log(location);
-//     weather = data.current.condition.text;
-//     //console.log(weather);
-// }
-
-
-
 
 function greetingHandler() {
     //Greeting section
@@ -238,47 +218,59 @@ function greetingHandler() {
     } else {
         updateElement("#greeting", "Welcome");
     }
-
-    //switch temperature value form fahrenheit to celcius and vise versa depending on selected
-    document.querySelector(".weather-group").addEventListener("click", function (e) {
-        let temp = e.target.id;
-        let weatherText = "";
-        if (temp == "fahr") {
-            weatherText = `The weather is ${condition} in ${userLocation} and it's ${celToFar(temperature).toFixed(1)}°F outside`;
-        } else {
-            weatherText = `The weather is ${condition} in ${userLocation} and it's ${temperature.toFixed(1)}°C outside`;
-        }
-        updateElement(`#weather`, weatherText);
-    });
-
 }
-async function getWeather() {
-    let url = 'https://api.weatherapi.com/v1/current.json?key=c88760dbb34447a0a4b202440231209&q=Samoa&aqi=no';
 
 
-    // setInterval(function () {
-    fetch(url)
-        .then(response => response.json())
-        .then(data => {
-            // Process and use the data here
-            // console.log(data);
-            // location = data.location;
-            // weather = data['current'];
-            console.log(data);
-            processData(data);
-        })
-        .catch(error => {
-            // Handle errors here
-            console.log(error + '\nPlease check URL for API');
-        });
-    // }, 1000);
+async function weatherHandler() {
+
+    navigator.geolocation.getCurrentPosition((location) => {
+        let lat = location.coords.latitude;
+        let lon = location.coords.longitude;
+
+        //update URL with parameters and consts
+        let url = weatherAPIURL
+            .replace('{lat}', lat)
+            .replace('{lon}', lon)
+            .replace('{API key}', weatherAPIKEY);
+        try {
+
+        } catch (error) {
+
+        }
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                const temp = data.main.temp;
+                const country = data.name;
+                const condition = data.weather[0].description;
+
+                let celciusText = `The weather is ${condition} in ${country} and it's ${temp.toFixed(1)}°C outside`;
+                let fahrenheitText = `The weather is ${condition} in ${country} and it's ${celToFar(temp).toFixed(1)}°F outside`;
+                //switch temperature value form fahrenheit to celcius and vise versa depending on selected
+                document.querySelector('p#weather').innerHTML = celciusText;
+                document.querySelector(".weather-group").addEventListener("click", function (e) {
+                    let temp = e.target.id;
+                    if (temp == "fahr") {
+                        updateElement('#weather', fahrenheitText);
+                    } else {
+                        updateElement('#weather', celciusText);
+                    }
+                });
+            }).catch((error => {
+                console.error('Weather API error: ', error);
+                updateElement('p#weather', 'Unable to get weather information. Please try again later.');
+            }));
+        //below line gets executed first before promise complete
+        //need to use await keyword inside async function
+        //console.log('test')
+    });
 
 }
 
 function processData(data) {
 
 }
-getWeather();
+weatherHandler();
 menuHandler();
 greetingHandler();
 clockHandler();
